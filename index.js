@@ -44,12 +44,17 @@
 
 	function stageTwo ( file ) {
     // Google Analytics event - heatmap upload file
-    ga('send', 'event', 'Heatmap', 'upload', undefined, file.size);
+    //ga('send', 'event', 'Heatmap', 'upload', undefined, file.size);
 
 		heat = L.heatLayer( [], heatOptions ).addTo( map );
 
 		var type;
 
+		var beginDate = Date.parse($("#startDate").val())
+		var endDate = Date.parse($("#endDate").val())
+		
+		if (beginDate )
+		
 		try {
 			if ( /\.kml$/i.test( file.name ) ) {
 				type = 'kml';
@@ -73,13 +78,15 @@
 
 		os.node( 'locations.*', function ( location ) {
 			var latitude = location.latitudeE7 * SCALAR_E7,
-				longitude = location.longitudeE7 * SCALAR_E7;
+				longitude = location.longitudeE7 * SCALAR_E7,
+				timestamp = parseInt(location.timestampMs);
 
 			// Handle negative latlngs due to google unsigned/signed integer bug.
 			if ( latitude > 180 ) latitude = latitude - (2 ** 32) * SCALAR_E7;
 			if ( longitude > 180 ) longitude = longitude - (2 ** 32) * SCALAR_E7;
 
-			if ( type === 'json' ) latlngs.push( [ latitude, longitude ] );
+
+			if ( type === 'json' && timestamp > beginDate && timestamp < endDate)  latlngs.push( [ latitude, longitude ] );
 			return oboe.drop;
 		} ).done( function () {
 			status( 'Generating map...' );
@@ -101,7 +108,7 @@
 
 	function stageThree ( numberProcessed ) {
     // Google Analytics event - heatmap render
-    ga('send', 'event', 'Heatmap', 'render', undefined, numberProcessed);
+    //ga('send', 'event', 'Heatmap', 'render', undefined, numberProcessed);
 
 		var $done = $( '#done' );
 
