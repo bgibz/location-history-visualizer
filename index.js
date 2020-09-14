@@ -16,14 +16,20 @@
 	function stageOne () {
 		var dropzone;
 
-		// Initialize the map
-		map = L.map( 'map' ).setView( [0,0], 2 );
+		// Initialize the maps
+		map = L.map( "map" ).setView( [0,0], 2 );
 		L.tileLayer( 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			attribution: 'location-history-visualizer is open source and available <a href="https://github.com/theopolisme/location-history-visualizer">on GitHub</a>. Map data &copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors.',
+			//attribution: 'location-history-visualizer is open source and available <a href="https://github.com/theopolisme/location-history-visualizer">on GitHub</a>. Map data &copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors.',
 			maxZoom: 18,
 			minZoom: 2
 		} ).addTo( map );
-
+		
+		comp_map = L.map( "compare_map", { zoomControl: false } ).setView( [0,0], 2 );
+		L.tileLayer( 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			minZoom: 2,
+		} ).addTo( comp_map );
+		
 		// Initialize the dropzone
 		dropzone = new Dropzone( document.body, {
 			url: '/',
@@ -120,22 +126,11 @@
 		// Update count
 		$( '#numberProcessed' ).text( numberProcessed.toLocaleString() );
 
-    $( '#launch' ).click( function () {
-      var $email = $( '#email' );
-      if ( $email.is( ':valid' ) ) {
-        $( this ).text( 'Launching... ' );
-        $.post( '/heatmap/submit-email.php', {
-          email: $email.val()
-        } )
-        .always( function () {
-          $( 'body' ).addClass( 'map-active' );
-          $done.fadeOut();
-          activateControls();
-        } );
-      } else {
-        alert( 'Please enter a valid email address to proceed.' );
-      }
-    } );
+		$( '#launch' ).click( function () {
+			$( 'body' ).addClass( 'map-active' );
+			$done.fadeOut();
+			activateControls();
+		} );
 
 		function activateControls () {
 			var $tileLayer = $( '.leaflet-tile-pane' ),
